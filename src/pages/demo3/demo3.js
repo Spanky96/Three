@@ -1,6 +1,7 @@
 // 画一条线
 const THREE = require('three');
 const Stats = require('stats-js');
+const dat = require('dat.gui');
 // 画布（长宽） 渲染器 摄像头 场景 灯光 物件
 var width;
 var height;
@@ -28,18 +29,26 @@ const initThree = function () {
 
 const initCamera = function () {
   camera = new THREE.PerspectiveCamera(60, width / height, 1, 10000);
-  camera.position.x = 50;
-  camera.position.y = 50;
+  camera.position.x = 100;
+  camera.position.y = 100;
   camera.position.z = 200;
 
-  // camera.up.x = 1;
+  // camera.up.x = 0;
   // camera.up.y = 1;
-  // camera.up.z = 2;
+  // camera.up.z = 0;
 
-  // camera.lookAt({
-  //   x: 0, y: 0, z: 50
-  // });
-}
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
+};
+
+var param;
+const createUI = function () {
+  var ParamObj = function () {
+    this.fov = 45;
+  };
+  param = new ParamObj();
+  var gui = new dat.GUI();
+  gui.add(param, 'fov', 0, 180).name('视角大小');
+};
 
 const initScene = function () {
   scene = new THREE.Scene();
@@ -47,26 +56,23 @@ const initScene = function () {
 
 const initLight = function () {
   light = new THREE.DirectionalLight(0x00ffff, 1.0); // 平行光
-  light.position.set(100, 100, 20);
+  light.position.set(100, 100, 1000);
   scene.add(light);
 };
  
 const initObject = function () {
-  var geometry = new THREE.Geometry();
-  var p1 = new THREE.Vector3(0, 0, 0);
-  var p2 = new THREE.Vector3(100, 100, 30);
-  geometry.vertices.push(p1); // 顶点
-  geometry.vertices.push(p2);
-  geometry.vertices.push(new THREE.Vector3(0, 100, 30));
-  geometry.colors.push(new THREE.Color(0xFF0000),
-    new THREE.Color(0x00FF00),
-    new THREE.Color(0x0000FF));
-  // 使用定点颜色
-  var material = new THREE.LineBasicMaterial({vertexColors: true});
-  // 不适用定点颜色
-  // var material = new THREE.LineBasicMaterial({vertexColors: false, color: 'blue'});
-  var line = new THREE.Line(geometry, material, THREE.LineSegments);
-  scene.add(line);
+  var geometry = new THREE.CylinderGeometry(0, 30, 50, 4);
+  var material = new THREE.MeshLambertMaterial({ color: 0xFFFFFF});
+  var mesh = new THREE.Mesh(geometry, material);
+  mesh.position = new THREE.Vector3(0, 0, 0);
+  scene.add(mesh);
+};
+function setCameraFov(fov) {
+  camera.fov = fov;
+  camera.updateProjectionMatrix();
+}
+const changeParam = function () {
+  setCameraFov(param.fov);
 };
 
 initThree();
@@ -74,12 +80,14 @@ initCamera();
 initScene();
 initLight();
 initObject();
+createUI();
 //坐标轴辅助
 var axes = new THREE.AxisHelper(10000);
 scene.add(axes);
 
 function render () {
   stats.begin();
+  changeParam();
   requestAnimationFrame(render);
   renderer.render(scene, camera);
   stats.end();

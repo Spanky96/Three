@@ -1,4 +1,4 @@
-{  
+{
   "name": "three",
   "version": "1.0.0",
   "author": "Spanky",
@@ -39,6 +39,9 @@
   "dependencies": {
     "autoprefixer": "^7.1.2",
     "babel-polyfill": "^6.26.0",
-    "babel-runtime": "^6.26.0"
+    "babel-runtime": "^6.26.0",
+    "dat.gui": "^0.7.6",
+    "stats-js": "^1.0.0",
+    "three": "^0.103.0"
   }
 }
