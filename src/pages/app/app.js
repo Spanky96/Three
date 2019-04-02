@@ -15,10 +15,13 @@ var cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 camera.position.z = 5;
 
+//坐标轴辅助
+var axes = new THREE.AxisHelper(100);
+scene.add(axes)
+
 function render () {
     requestAnimationFrame(render);
-    //cube.rotation.x += 0.01;
-    cube.rotation.z += 0.01;
+    cube.rotation.y += 0.01;
     renderer.render(scene, camera);
 }
 render();
