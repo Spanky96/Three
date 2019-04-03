@@ -1,0 +1,154 @@
+.yymtable {
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    .center {
+        margin: 0 auto;
+    }
+    .xian {
+        position: relative;
+        &:not(:last-child) {
+            margin-bottom: 20px;
+            &::after {
+                content: ' ';
+                width: 2px;
+                height: 20px;
+                background: #f15b5b;
+                bottom: -20px;
+                position: absolute;
+            }
+        }
+        &:not(:first-child) {
+            margin-top: 20px;
+            &::before {
+                content: ' ';
+                width: 2px;
+                height: 20px;
+                background: #f15b5b;
+                top: -20px;
+                position: absolute;
+            }
+        }
+    }
+    .frameborder {
+        border: 2px solid #f15b5b;
+        border-radius: 5px;
+        padding: 8px 10px;
+        background: #eef9fc;
+        height: 20px;
+        width: 260px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .whiteInput {
+            border-style: none;
+            outline: none;
+            text-indent: 8px;
+            height: 20px;
+            line-height: 20px;
+            font-size: 16px;
+            width: 130px;
+        }
+        .borderInput {
+            border-style: none;
+            outline: none;
+            height: 20px;
+            line-height: 20px;
+            font-size: 14px;
+            width: 80px;
+            background: none;
+            border-bottom: 1px solid;
+        }
+    }
+    .weiyuans {
+        display: flex;
+        position: relative;
+        width: calc(176px * 5);
+        margin: 0 auto;
+        left: 1px;
+        .frameborder {
+            margin: 18px 8px;
+            width: 136px;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            &::after {
+                content: ' ';
+                width: 2px;
+                height: 20px;
+                background: #f15b5b;
+                bottom: -20px;
+                position: absolute;
+            }
+            &::before {
+                content: ' ';
+                width: 2px;
+                height: 20px;
+                background: #f15b5b;
+                top: -20px;
+                position: absolute;
+            }
+        }
+        position: relative;
+        &::after {
+            content: ' ';
+            width: calc(100% - 176px);
+            height: 103px;
+            z-index: -5;
+            border-top: 2px solid #f15b5b;
+            border-bottom: 2px solid #f15b5b;
+            position: absolute;
+            left: 88px;
+        }
+    }
+    .zzs {
+        display: flex;
+        position: relative;
+        width: calc(56px * 6);
+        margin: 0 auto;
+        left: 3px;
+        .frameborder {
+            margin: 18px 8px;
+            width: 15px;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            &::after {
+                content: ' ';
+                width: 2px;
+                height: 20px;
+                background: #f15b5b;
+                bottom: -20px;
+                position: absolute;
+            }
+            &::before {
+                content: ' ';
+                width: 2px;
+                height: 20px;
+                background: #f15b5b;
+                top: -20px;
+                position: absolute;
+            }
+            .verInput {
+                display: block;
+                outline: none;
+                height: 75px;
+                width: 24px;
+                background: white;
+            }
+        }
+        position: relative;
+        &::after {
+            content: ' ';
+            width: calc(100% - 61px);
+            height: 272px;
+            z-index: -5;
+            border-top: 2px solid #f15b5b;
+            border-bottom: 2px solid #f15b5b;
+            position: absolute;
+            left: 28px;
+        }
+    }
+}

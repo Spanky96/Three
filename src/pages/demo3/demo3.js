@@ -10,6 +10,7 @@ var camera;
 var scene;
 var light;
 var stats;
+var gui = new dat.GUI();
 const initThree = function () {
   width = document.getElementById('canvas-frame').clientWidth;
   height = document.getElementById('canvas-frame').clientHeight;
@@ -40,14 +41,23 @@ const initCamera = function () {
   camera.lookAt(new THREE.Vector3(0, 0, 0));
 };
 
-var param;
-const createUI = function () {
-  var ParamObj = function () {
-    this.fov = 45;
+
+var ParamObj = function () {
+  this.camera = {
+    fov: 45
   };
-  param = new ParamObj();
-  var gui = new dat.GUI();
-  gui.add(param, 'fov', 0, 180).name('视角大小');
+  this.light = {
+    x: 0,
+    y: 0,
+    z: 100,
+    color: '#ffffff',
+    intensity: 1,
+  };
+};
+var param = new ParamObj();
+const createUI = function () {
+  var f = gui.addFolder('视角');
+  f.add(param.camera, 'fov', 0, 180).name('视角大小');
 };
 
 const initScene = function () {
@@ -55,24 +65,37 @@ const initScene = function () {
 };
 
 const initLight = function () {
-  light = new THREE.DirectionalLight(0x00ffff, 1.0); // 平行光
-  light.position.set(100, 100, 1000);
+  light = new THREE.PointLight(0xffffff, 1, 500, 0.5);
+  // light = new THREE.DirectionalLight(0xffffff, param.intensity);
+  light.position.set(param.x, param.y, param.z);
+  var f = gui.addFolder('光');
+  f.add(param.light, 'x', -200, 200).name('位置：X');
+  f.add(param.light, 'y', -200, 200).name('位置：Y');
+  f.add(param.light, 'z', -200, 200).name('位置：Z');
+  f.add(param.light, 'intensity', 0, 1).name('强度');
+  f.addColor(param.light, 'color').name('颜色');
   scene.add(light);
 };
  
 const initObject = function () {
-  var geometry = new THREE.CylinderGeometry(0, 30, 50, 4);
+  var geometry = new THREE.CylinderGeometry(0, 30, 50, 60);
   var material = new THREE.MeshLambertMaterial({ color: 0xFFFFFF});
   var mesh = new THREE.Mesh(geometry, material);
   mesh.position = new THREE.Vector3(0, 0, 0);
   scene.add(mesh);
 };
-function setCameraFov(fov) {
-  camera.fov = fov;
+function setCameraFov(cameraParam) {
+  camera.fov = cameraParam.fov;
   camera.updateProjectionMatrix();
 }
+function setLight(Lightparam) {
+  light.position.set(Lightparam.x, Lightparam.y, Lightparam.z);
+  light.intensity = Lightparam.intensity;
+  light.color.set(Lightparam.color);
+}
 const changeParam = function () {
-  setCameraFov(param.fov);
+  setCameraFov(param.camera);
+  setLight(param.light);
 };
 
 initThree();

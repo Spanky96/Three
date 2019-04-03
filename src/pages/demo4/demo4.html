@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+  </style>
+</head>
+
+<body>
+<div class="yymtable">
+  <div class="xian">
+    <div class="frameborder center">
+      党支部书记：<input type="text" class="whiteInput" name="" id="">
+    </div>
+  </div>
+  <div class="xian">
+    <div class="frameborder center">
+      党支部副书记：<input type="text" class="whiteInput" name="" id="">
+    </div>
+  </div>
+  <div class="xian" id="weiyuanBrother">
+    <div class="frameborder center" style="width:100px;justify-content: space-around;">
+      党支部委员 <input type="checkbox" name="dzbwy" class="checkBox" checked="checked" id=""selector="#weiyuan">
+    </div>
+  </div>
+  <div class="xian" id="weiyuan">
+    <div class="weiyuans">
+      <div class="frameborder">
+        <div><input type="text" class="borderInput">委员：</div>
+        <div><input type="text" class="whiteInput"></div>
+      </div>
+      <div class="frameborder">
+        <div><input type="text" class="borderInput">委员：</div>
+        <div><input type="text" class="whiteInput"></div>
+      </div>
+      <div class="frameborder">
+        <div><input type="text" class="borderInput">委员：</div>
+        <div><input type="text" class="whiteInput"></div>
+      </div>
+      <div class="frameborder">
+        <div><input type="text" class="borderInput">委员：</div>
+        <div><input type="text" class="whiteInput"></div>
+      </div>
+      <div class="frameborder">
+        <div><input type="text" class="borderInput">委员：</div>
+        <div><input type="text" class="whiteInput"></div>
+      </div>
+
+    </div>
+  </div>
+  <div class="xian" id="xiaozuBrother">
+    <div class="frameborder center" style="width:100px;justify-content: space-around;">
+      党小组 <input type="checkbox" name="dxz" class="checkBox" checked="checked" id="" selector="#xiaozu">
+    </div>
+  </div>
+  <div class="xian" id="xiaozu">
+    <div class="zzs">
+      <div class="frameborder">
+        第一党小组组长 <div contenteditable="true" class="verInput"></div>
+      </div>
+      <div class="frameborder">
+        第二党小组组长 <div contenteditable="true" class="verInput"></div>
+      </div>
+      <div class="frameborder">
+        第三党小组组长 <div contenteditable="true" class="verInput"></div>
+      </div>
+      <div class="frameborder">
+        第四党小组组长 <div contenteditable="true" class="verInput"></div>
+      </div>
+      <div class="frameborder">
+        第五党小组组长 <div contenteditable="true" class="verInput"></div>
+      </div>
+      <div class="frameborder">
+        第六党小组组长 <div contenteditable="true" class="verInput"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/1.11.3/jquery.js"></script>
+<script>
+var saveElement = {};
+$('.yymtable').on("click", '.checkBox', function() {
+    var select = $(this).attr('selector');
+    if ($(this).prop("checked")) {
+      var element = $(saveElement[select]);
+      element.attr('id', select.slice(1));
+      var borther = $(select + 'Brother');
+      $(select + 'Brother').after(element);
+    } else {
+      saveElement[select] = $(select).prop("outerHTML");
+      $(select).remove();
+    }
+  }
+);
+function toggle(ele, select) {
+  
+}
+</script>
+</html>
