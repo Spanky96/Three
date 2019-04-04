@@ -30,9 +30,9 @@ const initThree = function () {
 
 const initCamera = function () {
   camera = new THREE.PerspectiveCamera(60, width / height, 1, 10000);
-  camera.position.x = 500;
-  camera.position.y = 500;
-  camera.position.z = 1000;
+  camera.position.x = 200;
+  camera.position.y = 200;
+  camera.position.z = 500;
 
   // camera.up.x = 0;
   // camera.up.y = 1;
@@ -47,6 +47,11 @@ const initCamera = function () {
 var ParamObj = function () {
   this.camera = {
     fov: 45
+  };
+  this.p3 = {
+    x: -100,
+    y: 0,
+    z: 100
   };
   this.light = {
     x: 0,
@@ -63,37 +68,34 @@ const initScene = function () {
 };
 
 const initLight = function () {
-  light = new THREE.PointLight(0xffffff, 1, 500, 0.5);
-  // light = new THREE.DirectionalLight(0xffffff, param.intensity);
-  light.position.set(param.x, param.y, param.z);
-  var f = gui.addFolder('光');
-  f.add(param.light, 'x', -200, 200).name('位置：X');
-  f.add(param.light, 'y', -200, 200).name('位置：Y');
-  f.add(param.light, 'z', -200, 200).name('位置：Z');
-  f.add(param.light, 'intensity', 0, 1).name('强度');
-  f.addColor(param.light, 'color').name('颜色');
+  light = new THREE.DirectionalLight(0x00ffff, 1.0); // 平行光
+  light.position.set(100, 100, 20);
   scene.add(light);
 };
-var texture;
+var p3, geometry;
 const initObject = function () {
-  var geometry = new THREE.Geometry();
-  var material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors, wireframe: true});
+  geometry = new THREE.Geometry();
+  var material = new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors, wireframe: false});
   var p1 = new THREE.Vector3(100, 0, 0);
-  var p2 = new THREE.Vector3(-100, 0, 0);
-  var p3 = new THREE.Vector3(0, 100, 0);
+  var p2 = new THREE.Vector3(0, 100, 0);
+  p3 = new THREE.Vector3(param.p3.x, param.p3.y, param.p3.z);  // 要逆时针，面的法向量对相机
+  
+  var f = gui.addFolder('p3');
+  f.add(param.p3, 'x', -200, 200).name('x');
+  f.add(param.p3, 'y', -200, 200).name('y');
+  f.add(param.p3, 'z', -200, 200).name('z');
+  
   var color1 = new THREE.Color(0xFF0000);
   var color2 = new THREE.Color(0x00FF00);
   var color3 = new THREE.Color(0x0000FF);
 
-  geometry.vertices.push(p1, p2, p3);
+  geometry.vertices.push(p1, p2, p3); 
   geometry.colors.push(color1, color2, color3);
   var face = new THREE.Face3(0, 1, 2);
   face.vertexColors.push(color1, color2, color3);
-
   geometry.faces.push(face);
-  var mesh = new THREE.Mesh(geometry, material);
-  console.log(geometry);
-  scene.add(mesh);
+  var object = new THREE.Mesh(geometry, material);
+  scene.add(object);
 };
 function setCameraFov(cameraParam) {
   camera.fov = cameraParam.fov;
@@ -104,10 +106,17 @@ function setLight(Lightparam) {
   light.intensity = Lightparam.intensity;
   light.color.set(Lightparam.color);
 }
+function setP3(P3Param) {
+  p3.x = P3Param.x;
+  p3.y = P3Param.y;
+  p3.z = P3Param.z;
+  geometry.elementsNeedUpdate = true
+}
 
 const changeParam = function () {
   setCameraFov(param.camera);
   setLight(param.light);
+  setP3(param.p3);
 };
 
 initThree();
