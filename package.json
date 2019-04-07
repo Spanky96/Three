@@ -42,6 +42,7 @@
     "babel-runtime": "^6.26.0",
     "dat.gui": "^0.7.6",
     "stats-js": "^1.0.0",
-    "three": "^0.103.0"
+    "three": "^0.103.0",
+    "three-ply-loader": "^1.0.0"
   }
 }
