@@ -1,4 +1,4 @@
-// 画一条线
+// 画很多三角 BufferGeometry
 const THREE = require('three');
 require('three-ply-loader')(THREE);
 const Stats = require('stats-js');

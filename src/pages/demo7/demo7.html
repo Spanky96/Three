@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    .container {
+      position: relative;
+    }
+    #container1,#container2,#container3,#container4,#container5 {
+      position: absolute;
+      border: 1px solid #f00;
+      width: 500px;
+      height: 250px;
+    }
+    #container1 {left: 0;}
+    #container2 {left: 520px;}
+    #container3 {top: 270px;}
+    #container4 {top: 270px; left: 520px;}
+    #container5 {top: 540px;background: black;}
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div id="container1"></div>
+    <div id="container2"></div>
+    <div id="container3"></div>
+    <div id="container4"></div>
+    <div id="container5"></div>
+  </div>
+</body>
+
+</html>

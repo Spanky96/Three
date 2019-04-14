@@ -1,4 +1,4 @@
-// 画一条线
+// TextureLoader
 const THREE = require('three');
 const Stats = require('stats-js');
 const dat = require('dat.gui');
