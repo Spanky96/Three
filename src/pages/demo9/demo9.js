@@ -45,8 +45,8 @@ function init() {
 
   scene.add(boxMesh);
 
-  var geometry = new THREE.CylinderGeometry(0, 15, 30, 3);
-  objMesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({color: 'red'}));
+  geometry = new THREE.CylinderGeometry(0, 15, 30, 3);
+  var objMesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({color: 'red'}));
   
   pivot = new THREE.Group();
   scene.add(pivot);
