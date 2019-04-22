@@ -32,15 +32,15 @@ function init() {
     // 地形
     var mesh = createMesh(geometry, 'yellow', 1, [0, 0, 0], [30, 0.1, 100], false);
     mesh.rotation.x = Math.PI / 2;
-    scene.add(mesh);
+    parent.add(mesh);
   });
 
   bloader = new BinaryLoader();
   // 汽车
   bloader.load( "/static/42/veyron/VeyronNoUv_bin.js", function( geometry ) {
-    var mesh = createMesh(geometry, 0x00ff00, 1, [500, -300, -7000], [5, 5, 5], false);
+    var mesh = createMesh(geometry, 0x00ff00, 1, [1000, 0, -3000], [5, 5, 5], false);
     mesh.rotation.y = 0.5;
-    scene.add(mesh);
+    parent.add(mesh);
   });
 
   bloader.load( "/static/42/female02/Female02_bin.js", function( geometry ) {
