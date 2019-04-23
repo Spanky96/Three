@@ -133,9 +133,14 @@ const generateConfig = env => {
           }).scss
         },{
           test: /\.(htm|html)$/i,
-          use:['html-withimg-loader'] 
+          use:['html-loader'] 
         }
       ]
+    },
+    resolve: {
+      alias: {
+        '@assets': path.resolve(__dirname, '../src/assets')
+      }
     },
     plugins: [
       // 开发环境和生产环境二者均需要的插件
@@ -145,7 +150,7 @@ const generateConfig = env => {
             template: path.resolve(__dirname, "../src/pages/" + n, n + ".html"),
             chunks: [n],
             minify: {
-                collapseWhitespace: true
+              collapseWhitespace: true
             }
           });
       }),

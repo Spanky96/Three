@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>游戏</title>
+  <style>
+    body {
+      overflow: hidden;
+      padding: 0;
+      margin: 0;
+
+      color: #222;
+      background-color: #BBB;
+      font-family: arial;
+      font-size: 100%;
+    }
+
+    #info .top {
+      position: absolute;
+      top: 0px;
+      width: 100%;
+      padding: 5px;
+      text-align: center;
+    }
+
+    #info a {
+      color: #66F;
+      text-decoration: none;
+    }
+
+    #info a:hover {
+      text-decoration: underline;
+    }
+
+    #info .bottom {
+      position: absolute;
+      bottom: 0px;
+      right: 5px;
+      padding: 5px;
+    }
+
+    .windoz {
+      position: absolute;
+      display: none;
+      background-color: rgba(1, 1, 1, 1);
+      color: #fff;
+      padding: 20px;
+      box-shadow: 0px 0px 20px #0000FF;
+      left: 50%;
+      top: 50%;
+      margin-left: -200px;
+      margin-top: -170px;
+      border-radius: 10px;
+      width: 400px;
+      height: 200px;
+    }
+
+    .windoz .petit {
+      font-size: 8pt;
+      font-style: italic
+    }
+
+    .windoz h1 {
+      color: #999
+    }
+
+    .windoz a {
+      display: inline-block;
+      width: 120px;
+      height: 20px;
+      font-weight: bold;
+      text-align: center;
+      border-radius: 2px;
+      text-decoration: none;
+      background-color: #ff5400;
+      color: black
+    }
+
+    .windoz a:hover {
+      background-color: red;
+      color: black
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+
+  <div class='windoz' id='win'>
+    <h1>恭喜您!</h1>
+    <h2>您赢了 :)</h2>
+    <div class='petit'>请阅读我们的教程，5天学会游戏开发 ;)</div><br />
+    <a href='#' onclick="GAME.restart()">重玩</a>
+  </div>
+
+  <div class='windoz' id='loose'>
+    <img src='~@assets/imgs/noob.png' style='float: right' />
+    <h1>菜鸟 !</h1>
+    <a href='#' onclick="GAME.restart()">再来一次</a>
+  </div>
+
+  <div class='windoz' id='start'>
+    <h1>飞行游戏</h1>
+    <img src='~@assets/imgs/arrowKeys.png' style='float: right' />
+    <p>穿过高楼大厦，别掉下来了:),方向键控制,玩10次以上才算入门哦。</p>
+    <a href='#' onclick="GAME.start()">开始</a>
+  </div>
+</body>
+
+</html>
