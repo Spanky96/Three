@@ -83,7 +83,7 @@ const initObject = function () {
   var geometry = new THREE.CylinderGeometry(0, 30, 50, 60);
   new THREE.TextureLoader().load('/static/imgs/timg.jpg', function (text) {
     texture = text;
-    text.wrapS = text.wrapT = param.texture.wrap;
+    text.wrapS = text.wrapT = 1000;
     var material = new THREE.MeshBasicMaterial({map: text});
     var mesh = new THREE.Mesh(geometry, material);
     mesh.position = new THREE.Vector3(0, 0, 0);
