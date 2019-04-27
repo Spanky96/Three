@@ -133,13 +133,14 @@ const generateConfig = env => {
           }).scss
         },{
           test: /\.(htm|html)$/i,
-          use:['html-loader'] 
+          use:['html-loader']
         }
       ]
     },
     resolve: {
       alias: {
-        '@assets': path.resolve(__dirname, '../src/assets')
+        '@assets': path.resolve(__dirname, '../src/assets'),
+        '@src': path.resolve(__dirname, '../src')
       }
     },
     plugins: [

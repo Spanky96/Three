@@ -1,5 +1,6 @@
 // 游戏
 const THREE = require('three');
+var ColladaLoader = require('@src/utils/ColladaLoader');
 class Game {
   constructor(container, start, win, loose) {
     this.container = document.getElementById(container);
@@ -41,7 +42,7 @@ class Game {
 
     var ambientLight = new THREE.AmbientLight(0x555555);
     scene.add(ambientLight);
-    
+
     var pointLight = new THREE.PointLight(0xff6600, 1, 50);
     scene.add(pointLight);
 
@@ -67,31 +68,37 @@ class Game {
     shadowLight.shadowMapHeight = 512;
     scene.add(shadowLight);
 
-    // 天空
-    THREE.ImageUtils.loadTextureCube(
-      ['/static/imgs/skybox/posx.jpg', '/static/imgs/skybox/negx.jpg', '/static/imgs/skybox/posy.jpg',
-      '/static/imgs/skybox/negy.jpg', '/static/imgs/skybox/posz.jpg', '/static/imgs/skybox/negz.jpg'],
-      THREE.CubeRefractionMapping, function(texture) {
-        var shader = THREE.ShaderLib.cube;
-        shader.uniforms['tCube'].texture = texture;
-        shader.uniforms['tFlip'].texture = -1;
-        var cubeMaterial = new THREE.ShaderMaterial({
-          fragmentShader: shader.fragmentShader,
-          vertexShader: shader.vertexShader,
-          uniforms: shader.uniforms,
-          depthWrite: false,
-          side: THREE.DoubleSide
-        });
+    // 飞机模型
+    var colladaLoader = new ColladaLoader();
+    colladaLoader.options.convertUpAxis = true;
+    colladaLoader.load('/static/tux/tux.dae', function colladaReady(collada) {
+      var tuxScene = collada.scene;
+      tuxScene.scale.x = tuxScene.scale.y = tuxScene.scale.z = 1;
+      tuxScene.updateMatrix();
+      spotLight.target = tuxScene;
+      shadowLight.target = tuxScene;
+      tuxScene.children[0].castShadow = true;
+      tuxScene.children[0].receiveShadow = true;
+      scene.add(tuxScene);
+    });
 
-        cubeMaterial.overdraw = true;
-        var skyboxMesh = new THREE.Mesh(new THREE.CubeGeometry(5000, 5000, 5000), cubeMaterial);
-        skyboxMesh.flipSided = true;
-        skyboxMesh.castShadow = false;
-        skyboxMesh.receiveShadow = false;
-        scene.add(skyboxMesh);
-      }
-    );
-    
+    // 背景
+    var loader = new THREE.CubeTextureLoader();
+    var textureCube = loader.load( [
+      '/static/imgs/skybox/posx.jpg', '/static/imgs/skybox/negx.jpg', '/static/imgs/skybox/posy.jpg',
+      '/static/imgs/skybox/negy.jpg', '/static/imgs/skybox/posz.jpg', '/static/imgs/skybox/negz.jpg'
+    ] );
+    var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, side: THREE.DoubleSide } );
+    var skyboxMesh = new THREE.Mesh(new THREE.CubeGeometry(5000, 5000, 5000), material);
+    scene.add(skyboxMesh);
+
+    var vm = this;
+    window.onresize = function () {
+      vm.camera.aspect = window.innerWidth / window.innerHeight;
+      vm.camera.updateProjectionMatrix();
+      vm.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
     this.animate();
   }
 
@@ -116,3 +123,4 @@ class Game {
 
 global.game = new Game('container', 'start', 'win', 'loose');
 game.init();
+game.start();
