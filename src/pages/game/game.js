@@ -1,6 +1,16 @@
 // 游戏
 const THREE = require('three');
+const dat = require('dat.gui');
+var gui = new dat.GUI();
 var ColladaLoader = require('@src/utils/ColladaLoader');
+var param = {
+  rotation: {
+    x: -1.5707963267948963,
+    y: 0,
+    z: 0
+  }
+};
+
 class Game {
   constructor(container, start, win, loose) {
     this.container = document.getElementById(container);
@@ -15,18 +25,27 @@ class Game {
 
   animate() {
     requestAnimationFrame(this.animate.bind(this));
+    this.changeParam();
     this.render();
+  }
+  changeParam() {
+    var vm = this;
+    if (vm.tuxScene) {
+      vm.tuxScene.rotation.x = param.rotation.x;
+      vm.tuxScene.rotation.y = param.rotation.y;
+      vm.tuxScene.rotation.z = param.rotation.z;
+    }
   }
   // 初始化游戏
   init() {
+    var vm = this;
     this.startContainer.style.display = "block";
     var renderer = new THREE.WebGLRenderer({
       antialias: true,
       preserveDrawingBuffer: true // to allow screenshot
     });
     renderer.setClearColor(0xbbbbbb, 1);
-    renderer.shadowMapEnabled = true;
-    renderer.shadowMapSoft = true;
+    renderer.shadowMap.enabled = true;
     renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer = renderer;
     this.container.appendChild(renderer.domElement);
@@ -54,23 +73,19 @@ class Game {
     var shadowLight = new THREE.DirectionalLight(0xaaaaaa, 4, 1);
     shadowLight.position.set(0, 0, -1);
     shadowLight.castShadow = true;
-    shadowLight.onlyShadow = true;
-    shadowLight.shadowCameraNear = 2;
-    shadowLight.shadowCameraFar = 200;
-    shadowLight.shadowCameraLeft = -10;
-    shadowLight.shadowCameraRight = 10;
-    shadowLight.shadowCameraTop = 10;
-    shadowLight.shadowCameraBottom = -10;
-    shadowLight.shadowCameraVisible = false;
-    shadowLight.shadowBias = 0;
-    shadowLight.shadowDarkness = 0.5;
-    shadowLight.shadowMapWidth = 512;
-    shadowLight.shadowMapHeight = 512;
+    shadowLight.shadow.camera.near = 2;
+    shadowLight.shadow.camera.far = 200;
+    shadowLight.shadow.camera.left = -10;
+    shadowLight.shadow.camera.right = 10;
+    shadowLight.shadow.camera.top = 10;
+    shadowLight.shadow.camera.bottom = -10;
+    shadowLight.shadow.bias = 0;
+    shadowLight.shadow.mapSize.width = 512;
+    shadowLight.shadow.mapSize.height = 512;
     scene.add(shadowLight);
 
     // 飞机模型
     var colladaLoader = new ColladaLoader();
-    colladaLoader.options.convertUpAxis = true;
     colladaLoader.load('/static/tux/tux.dae', function colladaReady(collada) {
       var tuxScene = collada.scene;
       tuxScene.scale.x = tuxScene.scale.y = tuxScene.scale.z = 1;
@@ -80,6 +95,9 @@ class Game {
       tuxScene.children[0].castShadow = true;
       tuxScene.children[0].receiveShadow = true;
       scene.add(tuxScene);
+      vm.tuxScene = tuxScene;
+      var f = gui.addFolder('飞机');
+      f.add(param.rotation, 'x', -Math.PI, Math.PI).name('旋转X');
     });
 
     // 背景
@@ -123,4 +141,4 @@ class Game {
 
 global.game = new Game('container', 'start', 'win', 'loose');
 game.init();
-game.start();
+// game.start();
