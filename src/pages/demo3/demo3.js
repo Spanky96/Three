@@ -2,6 +2,7 @@
 const THREE = require('three');
 const Stats = require('stats-js');
 const dat = require('dat.gui');
+var OrbitControls = require('@src/utils/OrbitControls');
 // 画布（长宽） 渲染器 摄像头 场景 灯光 物件
 var width;
 var height;
@@ -98,9 +99,17 @@ const changeParam = function () {
   setLight(param.light);
 };
 
+const initControl = function () {
+  var controls = new OrbitControls(camera, renderer.domElement);
+  controls.maxPolarAngle = Math.PI * 0.5; // 最大仰视角 45度
+  controls.minDistance = 1000;
+  controls.maxDistance = 5000;
+}
+
 initThree();
 initCamera();
 initScene();
+initControl();
 initLight();
 initObject();
 createUI();

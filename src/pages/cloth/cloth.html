@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: Monospace;
+      color: #9e6c0e;
+      background-color: #000;
+      margin: 0px;
+      overflow: hidden;
+    }
+
+    #info {
+      position: absolute;
+      padding: 10px;
+      width: 100%;
+      text-align: center;
+    }
+
+    a {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="info">Simple Cloth Simulation<br/>
+    Verlet integration with relaxed constraints<br/>
+    <a onclick="wind = !wind;">Wind</a> |
+    <a onclick="sphere.visible = !sphere.visible;">Ball</a> |
+    <a onclick="togglePins();">Pins</a>
+  </div>
+</body>
+
+</html>
