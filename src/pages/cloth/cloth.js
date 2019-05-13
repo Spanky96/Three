@@ -6,21 +6,193 @@ function togglePins() {
     //
 }
 
-var restDistance = 25;
-var xSegs = 10;
-var ySegs = 10;
-var clothFunction = plane( restDistance * xSegs, restDistance * ySegs );
-function plane( width, height ) {
-	return function ( u, v, target ) {
-		var x = ( u - 0.5 ) * width;
-		var y = ( v + 0.5 ) * height;
-		var z = 0;
-		target.set( x, y, z );
-	};
+var clothFunction = function ( u, v, target ) {
+  var x = ( u - 0.5 ) * 25 * 10;
+  var y = ( v + 0.5 ) * 25 * 10;
+  var z = 0;
+  target.set( x, y, z );
+};
+
+// 微粒 x,y,z 质量
+function Particle( x, y, z, mass ) {
+
+	this.position = new THREE.Vector3();
+	this.previous = new THREE.Vector3();
+	this.original = new THREE.Vector3();
+	this.a = new THREE.Vector3( 0, 0, 0 ); // acceleration
+	this.mass = mass;
+	this.invMass = 1 / mass;
+	this.tmp = new THREE.Vector3();
+	this.tmp2 = new THREE.Vector3();
+
+	// init
+
+	clothFunction( x, y, this.position ); // position
+	clothFunction( x, y, this.previous ); // previous
+	clothFunction( x, y, this.original );
+
 }
+
+// Force -> Acceleration
+
+Particle.prototype.addForce = function ( force ) {
+
+	this.a.add(
+		this.tmp2.copy( force ).multiplyScalar( this.invMass )
+	);
+
+};
+
+Particle.prototype.integrate = function ( timesq ) {
+  var DAMPING = 0.03;
+  var DRAG = 1 - DAMPING;
+	var newPos = this.tmp.subVectors( this.position, this.previous );
+	newPos.multiplyScalar( DRAG ).add( this.position );
+	newPos.add( this.a.multiplyScalar( timesq ) );
+
+	this.tmp = this.previous;
+	this.previous = this.position;
+	this.position = newPos;
+
+	this.a.set( 0, 0, 0 );
+
+};
+
+
+var diff = new THREE.Vector3();
+var tmpForce = new THREE.Vector3();
+function satisfyConstraints( p1, p2, distance ) {
+
+	diff.subVectors( p2.position, p1.position );
+	var currentDist = diff.length();
+	if ( currentDist === 0 ) return; // prevents division by 0
+	var correction = diff.multiplyScalar( 1 - distance / currentDist );
+	var correctionHalf = correction.multiplyScalar( 0.5 );
+	p1.position.add( correctionHalf );
+	p2.position.sub( correctionHalf );
+
+}
+
+function Cloth( w, h ) {
+  var restDistance = 25;
+  var MASS = 0.1;
+	w = w || 10;
+	h = h || 10;
+	this.w = w;
+	this.h = h;
+
+	var particles = []; //颗粒
+	var constraints = []; // 限制
+
+	var u, v;
+
+	// Create particles
+	for ( v = 0; v <= h; v ++ ) {
+
+		for ( u = 0; u <= w; u ++ ) {
+
+			particles.push(
+				new Particle( u / w, v / h, 0, MASS )
+			);
+
+		}
+
+	}
+
+	// Structural
+
+	for ( v = 0; v < h; v ++ ) {
+
+		for ( u = 0; u < w; u ++ ) {
+
+			constraints.push( [
+				particles[ index( u, v ) ],
+				particles[ index( u, v + 1 ) ],
+				restDistance
+			] );
+
+			constraints.push( [
+				particles[ index( u, v ) ],
+				particles[ index( u + 1, v ) ],
+				restDistance
+			] );
+
+		}
+
+	}
+
+	for ( u = w, v = 0; v < h; v ++ ) {
+
+		constraints.push( [
+			particles[ index( u, v ) ],
+			particles[ index( u, v + 1 ) ],
+			restDistance
+
+		] );
+
+	}
+
+	for ( v = h, u = 0; u < w; u ++ ) {
+
+		constraints.push( [
+			particles[ index( u, v ) ],
+			particles[ index( u + 1, v ) ],
+			restDistance
+		] );
+
+	}
+
+	this.particles = particles;
+	this.constraints = constraints;
+
+	function index( u, v ) {
+
+		return u + v * ( w + 1 );
+
+	}
+
+	this.index = index;
+
+}
+var cloth = new Cloth(10, 10);
+
 var container, stats;
 var camera, scene, renderer;
 var object;
+
+// 风力
+global.wind = true;
+var windStrength = 2;
+var windForce = new THREE.Vector3( 0, 0, 0 );
+var clothGeometry;
+
+// 重力
+var gravity = new THREE.Vector3( 0, -981 , 0 ).multiplyScalar( 0.1 );
+var lastTime = 0;
+
+var TIMESTEP_SQ = Math.pow(18 / 1000, 2);
+var ballPosition = new THREE.Vector3( 0, - 45, 0 );
+
+var pinsFormation = [];
+var pins = [ 6 ];
+
+pinsFormation.push( pins );
+
+pins = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
+pinsFormation.push( pins );
+
+pins = [ 0 ];
+pinsFormation.push( pins );
+
+pins = []; // cut the rope ;)
+pinsFormation.push( pins );
+
+pins = [ 0, cloth.w ]; // classic 2 pins
+pinsFormation.push( pins );
+
+pins = pinsFormation[ 1 ];
+
+
 init();
 animate();
 
@@ -73,18 +245,17 @@ function init() {
     side: THREE.DoubleSide,
     alphaTest: 0.5 // 设置运行alphaTest时要使用的alpha值。如果不透明度低于此值，则不会渲染材质。默认值为0。
   });
-  var clothGeometry = new THREE.ParametricBufferGeometry(clothFunction, 10, 10 );
+  clothGeometry = new THREE.ParametricBufferGeometry(clothFunction, 10, 10 );
   // cloth mesh
   object = new THREE.Mesh( clothGeometry, clothMaterial );
-  object.position.set( 0, 0, 0 );
-  object.castShadow = true;
-  scene.add( object );
-
   object.customDepthMaterial = new THREE.MeshDepthMaterial( {
     depthPacking: THREE.RGBADepthPacking,
     map: clothTexture,
     alphaTest: 0.5
   } );
+  object.position.set( 0, 0, 0 );
+  object.castShadow = true;
+  scene.add( object );
 
   // sphere 球
   // 球缓冲几何体 半径 水平分段数字 垂直分段数
@@ -205,10 +376,131 @@ function onWindowResize() {
 
 function animate() {
   requestAnimationFrame(animate);
+  var time = Date.now();
+  var windStrength = Math.cos( time / 7000 ) * 20 + 40;   // 风力大小 [-20, 60]
+  windForce.set( Math.sin( time / 2000 ), Math.cos( time / 3000 ), Math.sin( time / 1000 ) );
+  windForce.normalize();
+  windForce.multiplyScalar(windStrength);  // 风力向量
+  simulate(time);
+
   render();
   stats.update();
 }
 
 function render() {
+  var p = cloth.particles;
+  for ( var i = 0, il = p.length; i < il; i ++ ) {
+
+    var v = p[ i ].position;
+
+    clothGeometry.attributes.position.setXYZ( i, v.x, v.y, v.z );
+
+  }
+
+  clothGeometry.attributes.position.needsUpdate = true;
+
+  clothGeometry.computeVertexNormals();
+  sphere.position.copy( ballPosition );
   renderer.render(scene, camera);
 }
+
+function simulate(time) {
+  if (!lastTime) {
+    lastTime = time;
+    return;
+  }
+  var i, il, particles, particle, pt, constraints, constraint;
+  if ( wind ) {
+
+		var indx;
+		var normal = new THREE.Vector3();
+		var indices = clothGeometry.index;
+		var normals = clothGeometry.attributes.normal;
+
+		particles = cloth.particles;
+
+		for ( i = 0, il = indices.count; i < il; i += 3 ) {
+
+			for ( j = 0; j < 3; j ++ ) {
+
+				indx = indices.getX( i + j );
+				normal.fromBufferAttribute( normals, indx )
+				tmpForce.copy( normal ).normalize().multiplyScalar( normal.dot( windForce ) );
+				particles[ indx ].addForce( tmpForce );
+
+			}
+
+		}
+
+  }
+  for ( particles = cloth.particles, i = 0, il = particles.length; i < il; i ++ ) {
+
+		particle = particles[ i ];
+		particle.addForce( gravity );
+
+		particle.integrate( TIMESTEP_SQ );
+
+	}
+
+	// Start Constraints
+
+	constraints = cloth.constraints;
+	il = constraints.length;
+
+	for ( i = 0; i < il; i ++ ) {
+
+		constraint = constraints[ i ];
+		satisfyConstraints( constraint[ 0 ], constraint[ 1 ], constraint[ 2 ] );
+
+	}
+
+  // Ball Constraints
+  ballPosition.z = - Math.sin( Date.now() / 600 ) * 90; //+ 40;
+  ballPosition.x = Math.cos( Date.now() / 400 ) * 70;
+
+  if ( sphere.visible ) {
+
+		for ( particles = cloth.particles, i = 0, il = particles.length; i < il; i ++ ) {
+
+			particle = particles[ i ];
+			var pos = particle.position;
+			diff.subVectors( pos, ballPosition );
+			if ( diff.length() < 60 ) {
+
+				// collided
+				diff.normalize().multiplyScalar( 60 );
+				pos.copy( ballPosition ).add( diff );
+
+			}
+
+		}
+
+  }
+
+  // Floor Constraints
+
+	for ( particles = cloth.particles, i = 0, il = particles.length; i < il; i ++ ) {
+
+		particle = particles[ i ];
+		pos = particle.position;
+		if ( pos.y < - 250 ) {
+
+			pos.y = - 250;
+
+		}
+
+	}
+
+	// Pin Constraints
+
+	for ( i = 0, il = pins.length; i < il; i ++ ) {
+
+		var xy = pins[ i ];
+		var p = particles[ xy ];
+		p.position.copy( p.original );
+		p.previous.copy( p.original );
+
+	}
+
+}
+
