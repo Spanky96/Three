@@ -3,7 +3,7 @@ const Stats = require('stats-js');
 var OrbitControls = require('@src/utils/OrbitControls');
 
 function togglePins() {
-    //
+  // 
 }
 
 var clothFunction = function ( u, v, target ) {
@@ -62,7 +62,6 @@ Particle.prototype.integrate = function ( timesq ) {
 var diff = new THREE.Vector3();
 var tmpForce = new THREE.Vector3();
 function satisfyConstraints( p1, p2, distance ) {
-
 	diff.subVectors( p2.position, p1.position );
 	var currentDist = diff.length();
 	if ( currentDist === 0 ) return; // prevents division by 0
@@ -81,7 +80,7 @@ function Cloth( w, h ) {
 	this.w = w;
 	this.h = h;
 
-	var particles = []; //颗粒
+	var particles = []; // 颗粒
 	var constraints = []; // 限制
 
 	var u, v;
@@ -161,7 +160,7 @@ var camera, scene, renderer;
 var object;
 
 // 风力
-global.wind = true;
+global.wind = false;
 var windStrength = 2;
 var windForce = new THREE.Vector3( 0, 0, 0 );
 var clothGeometry;
@@ -346,8 +345,8 @@ function init() {
   controls.maxDistance = 5000;
 
   // helper
-  // var axesHelper = new THREE.AxesHelper(10000);
-  // scene.add(axesHelper);
+  var axesHelper = new THREE.AxesHelper(10000);
+  scene.add(axesHelper);
 
   // performance monitor
 
@@ -409,7 +408,7 @@ function simulate(time) {
     lastTime = time;
     return;
   }
-  var i, il, particles, particle, pt, constraints, constraint;
+  var i, il, j, particles, particle, constraints, constraint;
   if ( wind ) {
 
 		var indx;
