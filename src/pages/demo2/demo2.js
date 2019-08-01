@@ -50,7 +50,7 @@ const initLight = function () {
   light.position.set(100, 100, 20);
   scene.add(light);
 };
- 
+
 const initObject = function () {
   var geometry = new THREE.Geometry();
   var p1 = new THREE.Vector3(0, 0, 0);
@@ -67,6 +67,20 @@ const initObject = function () {
   // var material = new THREE.LineBasicMaterial({vertexColors: false, color: 'blue'});
   var line = new THREE.Line(geometry, material, THREE.LineSegments);
   scene.add(line);
+
+
+  var curve = new THREE.SplineCurve3([
+    new THREE.Vector3(-10, 10, 10),
+    new THREE.Vector3(10, 0, 10)
+  ]);
+
+  var geometry2 = new THREE.Geometry();
+  geometry2.vertices = curve.getPoints(50);
+  debugger
+  var material = new THREE.LineBasicMaterial({color : 0x000000});
+  var line2 = new THREE.Line(geometry2, material);
+  scene.add(line2);
+
 };
 
 initThree();
