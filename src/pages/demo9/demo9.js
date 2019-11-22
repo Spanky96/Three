@@ -67,7 +67,7 @@ function init() {
   container.appendChild( renderer.domElement );
 }
 function createMesh(geometry, color, size, position, scale, dynamic) {
-  var material = new THREE.PointsMaterial({color: color, size: size});
+  var material = new THREE.PointsMaterial({color: color, size: 10});
   var mesh = new THREE.Points(geometry, material);
   mesh.scale.x = scale[0];
   mesh.scale.z = scale[1];

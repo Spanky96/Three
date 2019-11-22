@@ -5,7 +5,7 @@ var OrbitControls = require('@src/utils/OrbitControls');
 
 var controls, camera, scene, renderer;
 var cameraCube, sceneCube;
-var textureEquirec, textureCube, textureSphere;
+var textureEquirec, textureCube, textureCube2, textureSphere;
 var cubeMesh, sphereMesh;
 var sphereMaterial;
 
@@ -40,6 +40,13 @@ function init() {
     textureCube.format = THREE.RGBFormat;
     textureCube.mapping = THREE.CubeReflectionMapping;
     textureCube.encoding = THREE.sRGBEncoding;    
+  });
+
+  require(["@assets/envmaps/Comp/posx.jpeg", "@assets/envmaps/Comp/negx.jpeg", "@assets/envmaps/Comp/posy.jpeg", "@assets/envmaps/Comp/negy.jpeg", "@assets/envmaps/Comp/posz.jpeg", "@assets/envmaps/Comp/negz.jpeg"], (i1, i2, i3, i4, i5, i6) => {
+    textureCube2 = new THREE.CubeTextureLoader().load([i1, i2, i3, i4, i5, i6]);
+    textureCube2.format = THREE.RGBFormat;
+    textureCube2.mapping = THREE.CubeReflectionMapping;
+    textureCube2.encoding = THREE.sRGBEncoding;    
   });
 
 
@@ -134,6 +141,14 @@ function init() {
       sphereMaterial.needsUpdate = true;
 
     },
+    Comp: function () {
+
+      cubeMesh.material = cubeMaterial;
+      cubeMesh.visible = true;
+      sphereMaterial.envMap = textureCube2;
+      sphereMaterial.needsUpdate = true;
+
+    },
     Equirectangular: function () {
 
       cubeMesh.material = equirectMaterial;
@@ -149,24 +164,35 @@ function init() {
       sphereMaterial.needsUpdate = true;
 
     },
-    Refraction: false
+    Refraction: false,
+    showBall: false
   };
 
   var gui = new dat.GUI();
   gui.add(params, 'Cube');
+  gui.add(params, 'Comp');
   gui.add(params, 'Equirectangular');
   gui.add(params, 'Spherical');
+  gui.add(params, 'showBall').onChange(function (value) {
+    if (value) {
+      sphereMesh.visible = true;
+    } else {
+      sphereMesh.visible = false;
+    }
+  });
   gui.add(params, 'Refraction').onChange(function (value) {
 
     if (value) {
 
       textureEquirec.mapping = THREE.EquirectangularRefractionMapping;
       textureCube.mapping = THREE.CubeRefractionMapping;
+      textureCube2.mapping = THREE.CubeRefractionMapping;
 
     } else {
 
       textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
       textureCube.mapping = THREE.CubeReflectionMapping;
+      textureCube2.mapping = THREE.CubeReflectionMapping;
 
     }
 
