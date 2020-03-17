@@ -1,68 +1,48 @@
 // 拾取
 const THREE = require('three');
-const Stats = require('stats-js');
-// const dat = require('dat.gui');
 
-var stats;
 var camera, scene, raycaster, renderer;
 
 var mouse = new THREE.Vector2(), INTERSECTED;
-var radius = 100, theta = 0;
+var radius = 100;
 var particles;
 var PARTICLE_SIZE = 5;
+var _THETA = 0.0001;
+var theta = _THETA;
+var __THETA = _THETA;
+var containerWidth = window.innerWidth;
+var containerHeight = window.innerHeight * 0.75;
 init();
 animate();
 
 function init () {
-  var container = document.createElement('div');
-  document.body.appendChild(container);
-
-  stats = new Stats();
-  stats.domElement.style.position = "absolute";
-  stats.domElement.style.left = "0";
-  stats.domElement.style.top = "0";
-  container.appendChild(stats.domElement);
-
-  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 200, 10000);
+  var container = document.getElementById('container');
   scene = new THREE.Scene();
-
+  camera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight / 0.75, 100, 10000);
+  camera.position.x = 0;
+  camera.position.y = 0;
+  camera.position.z = 0;
+  camera.lookAt(scene.position);
+  camera.updateMatrixWorld();
   var light = new THREE.DirectionalLight(0xffffff, 1);
   light.position.set(1, 1, 1).normalize();
   scene.add(light);
-
-  // for ( var i = 0; i < 10000; i ++ ) {
-  //   var starsGeometry = new THREE.Geometry();
-  //   var star = new THREE.Vector3();
-  //   starsGeometry.vertices.push( star );
-  //   var material = new THREE.PointsMaterial({color: 0xffffff, size: 1});
-  //   var object = new THREE.Points(starsGeometry, material);
-  //   object.position.x = THREE.Math.randFloatSpread(400);
-  //   object.position.y = Math.random() * 200 - 50;
-  //   object.position.z = THREE.Math.randFloatSpread(400);
-  //   scene.add(object);
-  // }
-
-  // var starsGeometry = new THREE.Geometry();
-
-  // for ( var i = 0; i < 10000; i ++ ) {
-  //   var star = new THREE.Vector3();
-  //   star.x = THREE.Math.randFloatSpread(400);
-  //   star.y = THREE.Math.randFloatSpread(400);
-  //   star.z = THREE.Math.randFloatSpread(400);
-  //   starsGeometry.vertices.push(400);
-  // }
-  var length = 1000;
+  var length = 10000;
   var positions = new Float32Array( length * 3 );
   var colors = new Float32Array( length * 3 );
   var sizes = new Float32Array( length );
   var color = new THREE.Color();
   var vertex;
   for ( var i = 0, l = length; i < l; i ++ ) {
+    // vertex = new THREE.Vector3(THREE.Math.randFloatSpread(window.innerWidth / 2), Math.random() * 0.75 / 4 * window.innerHeight, THREE.Math.randFloatSpread(window.innerWidth / 2));
+    var ramdomX = (Math.random() * containerWidth / 2) * (Math.random() > 0.5 ? 1 : -1);
+    var ramdomY = (Math.random() * containerWidth / 2) * (Math.random() > 0.5 ? 1 : -1);
+    var ramdomZ = (Math.random() * 200) * (Math.random() > 0.5 ? 1 : -1);
+    vertex = new THREE.Vector3(ramdomX, ramdomY, ramdomZ);
 
-    vertex = new THREE.Vector3(THREE.Math.randFloatSpread(400), THREE.Math.randFloatSpread(400), THREE.Math.randFloatSpread(400));
     vertex.toArray( positions, i * 3 );
 
-    color.setHSL( 1.0, 1.0, 1.0 );
+    color.setRGB( 1.0 * Math.random(), 1.0, 1.0 );
     color.toArray( colors, i * 3 );
 
     sizes[ i ] = PARTICLE_SIZE;
@@ -72,34 +52,56 @@ function init () {
   starsGeometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
   starsGeometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
   starsGeometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
-  var starsMaterial = new THREE.PointsMaterial({color: 0xffffff})
-  particles = new THREE.Points(starsGeometry, starsMaterial);
+  var material = new THREE.ShaderMaterial( {
+
+    uniforms: {
+      color: { value: new THREE.Color( 0xffffff ) },
+      texture: { value: new THREE.TextureLoader().load(require("./disc.png")) }
+    },
+    vertexShader: document.getElementById( 'vertexshader' ).textContent,
+    fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+
+    alphaTest: 0.9
+
+  } );
+
+  particles = new THREE.Points(starsGeometry, material);
   scene.add(particles);
- 
+
 
   raycaster = new THREE.Raycaster();
-  renderer = new THREE.WebGLRenderer();
-  renderer.setClearColor(0x050505);
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer = new THREE.WebGLRenderer({ antialias: true,alpha:true });
+  // renderer.setClearColor(0x050505);
+  renderer.setSize(containerWidth, containerHeight);
   renderer.sortObjects = false;
   container.appendChild(renderer.domElement);
 
+  renderer.domElement.addEventListener('click', (event) => {
+    if (INTERSECTED) {
+      alert('星星:' + INTERSECTED);
+    }
+  }, false);
+
   document.addEventListener('mousemove', (event) => {
     event.preventDefault();
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    mouse.x = (event.clientX / containerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / containerHeight) * 2 + 1;
   }, false);
 }
 
 function render () {
-  theta += 0.01;
-  camera.position.x = radius * Math.sin(THREE.Math.degToRad(theta));
-  camera.position.y = radius * Math.sin(THREE.Math.degToRad(theta));
-  camera.position.z = radius * Math.cos(THREE.Math.degToRad(theta));
-  camera.lookAt(scene.position);
-  camera.updateMatrixWorld();
+  // theta += _THETA;
+  // camera.position.x = radius * Math.sin(THREE.Math.degToRad(theta));
+  // camera.position.y = radius * Math.sin(THREE.Math.degToRad(theta));
+  // camera.position.z = radius;
+
+  // camera.lookAt(scene.position);
+  // camera.updateMatrixWorld();
+  particles.rotation.x += _THETA;
+  particles.rotation.y -= _THETA;
+  particles.rotation.z += (_THETA * (Math.random() > 0.5 ? 1 : -1));
   raycaster.setFromCamera(mouse, camera);
-  
+
   // debugger
   // var intersects = raycaster.intersectObject(particles);
   // if (intersects.length > 0) {
@@ -128,24 +130,23 @@ function render () {
   var attributes = geometry.attributes;
   var intersects = raycaster.intersectObject(particles);
   if ( intersects.length > 0 ) {
-    debugger
     if ( INTERSECTED != intersects[ 0 ].index ) {
 
       attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE;
 
       INTERSECTED = intersects[ 0 ].index;
 
-      attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE * 100;
-      attributes.size.needsUpdate = true;
+      attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE * 1.5;
 
+      attributes.size.needsUpdate = true;
+      _THETA = __THETA / 10;
     }
 
   } else if ( INTERSECTED !== null ) {
-
     attributes.size.array[ INTERSECTED ] = PARTICLE_SIZE;
     attributes.size.needsUpdate = true;
     INTERSECTED = null;
-
+    _THETA = __THETA;
   }
 
   renderer.render(scene, camera);
@@ -154,11 +155,12 @@ function render () {
 function animate () {
   requestAnimationFrame(animate);
   render();
-  stats.update();
 }
 
 window.onresize = function () {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  containerWidth = window.innerWidth;
+  containerHeight = window.innerHeight * 0.75;
+  camera.aspect = containerWidth / containerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(containerWidth, containerHeight);
 }
